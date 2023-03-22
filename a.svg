@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>等待</title>
+    <defs>
+        <circle id="path-1" cx="6.5" cy="6.5" r="6.5"></circle>
+    </defs>
+    <g id="5.0-可视化建模样式优化-0117" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="全局样式" transform="translate(-1192.000000, -403.000000)">
+            <g id="编组-2" transform="translate(60.000000, 363.000000)">
+                <g id="等待中" transform="translate(1132.000000, 40.000000)">
+                    <rect id="矩形" fill-opacity="0" fill="#D8D8D8" x="0" y="0" width="16" height="16"></rect>
+                    <g id="编组-24" transform="translate(1.500000, 1.500000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <use id="蒙版" stroke="#B8BABF" stroke-width="2" fill="#B8BABF" fill-rule="nonzero" stroke-linecap="round" stroke-linejoin="round" xlink:href="#path-1"></use>
+                        <line x1="6.02879297" y1="2.08092947" x2="6.02879297" y2="7" id="路径-3" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" mask="url(#mask-2)"></line>
+                        <line x1="9.11153829" y1="8.03419903" x2="6.02879297" y2="7" id="路径-3备份" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" mask="url(#mask-2)"></line>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
