@@ -5,8 +5,8 @@ const { SyncHook } = require('tapable')
 
 const parser = require('@babel/parser')
 const types = require('@babel/types')
-const traverse = require('@babel/traverse')
-const generator = require('@babel/generator')
+const traverse = require('@babel/traverse').default
+const generator = require('@babel/generator').default
 
 // 编译class,单例模式
 class Compiler {
@@ -30,7 +30,16 @@ class Compiler {
   run(callback) {
     // call触发事件, 响应的在plugin中注册的事件都会执行
     this.hooks.run.call()
-    const onCompiled = () => {
+    const onCompiled = (err, stats, fileDependencies) => {
+      // 10. 确定好输出内容后, 根据配置的输出路径和文件名,将文件写入到文件系统
+      for (let filename in stats.assets) {
+        let filePath = path.join(this.option.output.path, filename)
+        fs.writeFileSync(filePath, stats.assets[filename], 'utf8')
+      }
+      callback(err, {
+        toJson: () => stats
+      }
+    )
       // 编译完成触发的钩子
       this.hooks.done.call()
     }
@@ -45,7 +54,7 @@ function toUnixPath(filePath) {
   return filePath.replace(/\\/g, '/')
 }
 
-const baseDir = toUnixPath(process.cmd())
+const baseDir = toUnixPath(process.cwd())
 
 // 获取文件路径
 function tryExtensions(modulePath, extensions) {
@@ -97,7 +106,7 @@ function tryExtensions(modulePath, extensions) {
 
 class Compilation {
   constructor(webpackOptions) {
-    this.options = webpack
+    this.options = webpackOptions
     this.assets = [] // 本次编译产出的静态资源
     this.chunks = [] // 本次编译产出的代码块
     this.modules = [] // 本次编译产出的模块
@@ -150,7 +159,7 @@ class Compilation {
       {
         chunks: this.chunks,
         modules: this.modules,
-        assers: this.assets
+        assets: this.assets
       },
       this.fileDependencies
     )
@@ -202,7 +211,7 @@ class Compilation {
           // 获取依赖模块
           const depModuleName = node.arguments[0].value
           const dirname = path.posix.dirname(modulePath) // 获取当前正在编译模块所在目录
-          const depModulePath = path.posix.join(dirname, depModuleName) // 获取模块的绝对路径
+          let depModulePath = path.posix.join(dirname, depModuleName) // 获取模块的绝对路径
           const extensions = this.options.resolve?.extensions || ['.js'] // 获取配置中的extensions
           depModulePath = tryExtensions(depModulePath, extensions)
           // 将依赖模块的绝对路径push到依数组中
@@ -266,7 +275,7 @@ class WebpackRunPlugin {
 
 // 自定义插件, webpacj运行完成时执行
 class WebpackDonePlugin {
-  applu(compiler) {
+  apply(compiler) {
     compiler.hooks.done.tap('WebpackDonePlugin', () => {
       console.log('完成编译')
     })
