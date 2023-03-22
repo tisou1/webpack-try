@@ -1,4 +1,5 @@
 const path = require('path')
+const { WebpackRunPlugin, WebpackDonePlugin } = require('./webpack')
 
 
 module.exports = {
@@ -9,4 +10,8 @@ module.exports = {
     filename: '[name].js'
   },
   devtool: 'source-map', // 防止干扰源文件
+  plugins: [
+    new WebpackRunPlugin(),
+    new WebpackDonePlugin()
+  ]
 }

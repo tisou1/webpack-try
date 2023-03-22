@@ -1,5 +1,5 @@
 // const { webpack } = require('webpack')
-const webpack  = require('./webpack') // 手写
+const {webpack}  = require('./webpack') // 手写
 const webpackOptions = require('./webpack.config.js')
 const compiler = webpack(webpackOptions)
 
