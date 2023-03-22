@@ -61,6 +61,40 @@ function tryExtensions(modulePath, extensions) {
   throw new Error(`无法找到${modulePath}`)
 }
 
+
+//生成运行时代码
+ function getSource(chunk) {
+     return `
+      (() => {
+       var modules = {
+         ${chunk.modules.map(
+           (module) => `
+           "${module.id}": (module) => {
+             ${module._source}
+           }
+         `
+         )}  
+       };
+       var cache = {};
+       function require(moduleId) {
+         var cachedModule = cache[moduleId];
+         if (cachedModule !== undefined) {
+           return cachedModule.exports;
+         }
+        var module = (cache[moduleId] = {
+           exports: {},
+        });
+         modules[moduleId](module, module.exports, require);
+         return module.exports;
+      }
+       var exports ={};
+       ${chunk.entryModule._source}
+     })();
+      `;
+   }
+  
+
+
 class Compilation {
   constructor(webpackOptions) {
     this.options = webpack
@@ -105,8 +139,21 @@ class Compilation {
       this.chunks.push(chunk)
     }
 
-    // 编译成功够,执行回调函数
-    callback()
+    this.chunks.forEach(chunk => {
+      let filename = this.options.output.filename.replace('[name]', chunk.name)
+      this.assets[filename] = getSource(chunk)
+    })
+
+    // 编译成功h后,执行回调函数
+    callback(
+      null,
+      {
+        chunks: this.chunks,
+        modules: this.modules,
+        assers: this.assets
+      },
+      this.fileDependencies
+    )
   }
 
   // 编译模块,读取内容
