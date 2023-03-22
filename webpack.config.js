@@ -1,5 +1,10 @@
 const path = require('path')
-const { WebpackRunPlugin, WebpackDonePlugin } = require('./webpack')
+const { 
+   WebpackRunPlugin,
+   WebpackDonePlugin,
+   loader1,
+   loader2
+ } = require('./webpack')
 
 
 module.exports = {
@@ -13,5 +18,13 @@ module.exports = {
   plugins: [
     new WebpackRunPlugin(),
     new WebpackDonePlugin()
-  ]
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.js$/i,
+        use: [loader1, loader2]
+      }
+    ]
+}
 }
