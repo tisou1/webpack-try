@@ -1,5 +1,5 @@
 // const { webpack } = require('webpack')
-const {webpack}  = require('./webpack') // 手写
+const { webpack } = require('./webpack') // 手写
 const webpackOptions = require('./webpack.config.js')
 const compiler = webpack(webpackOptions)
 
@@ -10,12 +10,10 @@ compiler.run((err, stats) => {
     stats.toJson({
       assets: true, // 打印静态资源编译信息
       chunks: true, // 打印编译产出代码块
-      modules: true // 打印编译产出模块
-    })
+      modules: true, // 打印编译产出模块
+    }),
   )
 })
-
-
 
 /*
   1. 根据配置文件,找出入口文件

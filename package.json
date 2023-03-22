@@ -11,6 +11,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@antfu/eslint-config": "^0.37.0",
+    "@babel/generator": "^7.21.3",
+    "@babel/parser": "^7.21.3",
+    "@babel/traverse": "^7.21.3",
+    "@babel/types": "^7.21.3",
+    "eslint": "^8.36.0",
     "tapable": "^2.2.1",
     "webpack": "^5.76.2",
     "webpack-cli": "^5.0.1"
