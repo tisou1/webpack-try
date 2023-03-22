@@ -47,6 +47,20 @@ function toUnixPath(filePath) {
 
 const baseDir = toUnixPath(process.cmd())
 
+// 获取文件路径
+function tryExtensions(modulePath, extensions) {
+  if (fs.existsSync(modulePath))
+    return modulePath
+
+  for (let i = 0; i < extensions.length; i++) {
+    const filePath = modulePath + extensions[i]
+    if (fs.existsSync(filePath))
+      return filePath
+  }
+
+  throw new Error(`无法找到${modulePath}`)
+}
+
 class Compilation {
   constructor(webpackOptions) {
     this.options = webpack
@@ -118,6 +132,51 @@ class Compilation {
       return loader(code)
     }, sourceCode)
 
+    // 7. 找出此模块所依赖的模块, 在对模块进行编译
+    // 把源代码转换为ast
+
+    const ast = parser.parse(sourceCode, { sourceType: 'module' })
+    traverse(ast, {
+      CallExpression: (nodePath) => {
+        const { node } = nodePath
+        // 在ast中查找require语句
+        if (node.callee.name === 'require') {
+          // 获取依赖模块
+          const depModuleName = node.arguments[0].value
+          const dirname = path.posix.dirname(modulePath) // 获取当前正在编译模块所在目录
+          const depModulePath = path.posix.join(dirname, depModuleName) // 获取模块的绝对路径
+          const extensions = this.options.resolve?.extensions || ['.js'] // 获取配置中的extensions
+          depModulePath = tryExtensions(depModulePath, extensions)
+          // 将依赖模块的绝对路径push到依数组中
+          this.fileDependencies.push(depModulePath)
+          // 生成依赖模块的模块id
+          let depModuleId = './' + path.posix.relative(baseDir, depModulePath)
+          // 修改语法结构, 把依赖的模块改为依赖模块id, require("./name") => require("./src/name.js")
+          node.arguments = [types.stringLiteral(depModuleId)]
+          // 将依赖模块信息push到该模块的dependencied属性中
+          module.dependencies.push({ depModuleId, depModulePath })
+        }
+      },
+    })
+
+    // 生成新的代码, 并把转义后的源代码放到module._source上
+    let { code } = generator(ast)
+    module._source = code
+
+    // 对依赖模块进行编译, 也就是说要递归的对module对象中的dependeccies进行
+    module.dependencies.forEach(({depModuleId, depModulePath}) => {
+      let existModule = this.modules.find(item => item.id === depModuleId)
+      // 如果modules中已经存在将要编译的模块,那么就不需要在进行编译
+
+      if (existModule) {
+        // names指代该模块属于那个代码块chunk
+        existModule.names.push(name)
+      } else {
+        let depModule = this.buildModule(name, depModulePath)
+        this.modules.push(depModule)
+      }
+    })
+
     return module
   }
 }
@@ -128,8 +187,7 @@ function webpack(webpackOptions) {
   const compiler = new Compiler(webpackOptions)
   // 3. 挂载配置文件中的插件
   const { plugins } = webpackOptions
-  for (const plugin of plugins)
-    plugin.apply(compiler)
+  for (const plugin of plugins) plugin.apply(compiler)
 
   return compiler
 }

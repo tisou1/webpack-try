@@ -1,6 +1,6 @@
 // const { webpack } = require('webpack')
-const { webpack } = require('./webpack') // 手写
-const webpackOptions = require('./webpack.config.js')
+const { webpack } = require("./webpack") // 手写
+const webpackOptions = require("./webpack.config.js")
 const compiler = webpack(webpackOptions)
 
 // 开始编译
@@ -11,7 +11,7 @@ compiler.run((err, stats) => {
       assets: true, // 打印静态资源编译信息
       chunks: true, // 打印编译产出代码块
       modules: true, // 打印编译产出模块
-    }),
+    })
   )
 })
 
