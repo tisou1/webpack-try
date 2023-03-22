@@ -65,7 +65,7 @@ class Compilation {
   constructor(webpackOptions) {
     this.options = webpack
     this.assets = [] // 本次编译产出的静态资源
-    this.chunk = [] // 本次编译产出的代码块
+    this.chunks = [] // 本次编译产出的代码块
     this.modules = [] // 本次编译产出的模块
     this.fileDependencies = [] // //本次打包涉及到的文件，这里主要是为了实现watch模式下监听文件的变化，文件发生变化后会重新编译
   }
@@ -92,6 +92,17 @@ class Compilation {
 
       // 将生成的入口文件module对象,放进this.modules中
       this.modules.push(entryModule)
+
+      // 8. 等所有模块都编译完, 根据模块之间的依赖关系,组装代码块chunk
+      // 一般来说一个入口文件对应一个chunk
+
+      let chunk = {
+        name: entryName,
+        entryModule,
+        modules: this.modules.filter(item => item.names.includes(entryName))
+      }
+
+      this.chunks.push(chunk)
     }
 
     // 编译成功够,执行回调函数
