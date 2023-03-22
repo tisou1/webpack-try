@@ -12,9 +12,43 @@ class Compiler {
     }
   }
 
+  compiler(onCompiled) {
+    // 执行编译
+    const compilation = new Compilation(this.option)
+    
+    compilation.build(onCompiled)
 
-  run(callback) {}
+  }
+
+  // 4. 执行compiler的run方法
+  run(callback) {
+    // call触发事件, 响应的在plugin中注册的事件都会执行
+    this.hooks.run.call()
+    const onCompiled = () => {
+      // 编译完成触发的钩子
+      this.hooks.done.call()
+    }
+    this.compiler(onCompiled) // 开始编译, 编译完成调用onCompiled
+  }
 }
+
+class Compilation{
+  constructor(webpackOptions) {
+    this.options = webpack
+    this.assets = [] // 本次编译产出的静态资源
+    this.chunk = [] // 本次编译产出的代码块
+    this.modules = [] // 本次编译产出的模块
+    this.fileDependencies = [] // //本次打包涉及到的文件，这里主要是为了实现watch模式下监听文件的变化，文件发生变化后会重新编译
+  }
+
+  build(callback) {
+    // ...
+    
+    // 编译成功够,执行回调函数
+    callback()
+  }
+}
+
 
 // 1. 搭建结构
 function webpack(webpackOptions){
@@ -26,6 +60,7 @@ function webpack(webpackOptions){
     plugin.apply(compiler)
   }
 
+ 
   return compiler
 }
 
@@ -37,6 +72,7 @@ function webpack(webpackOptions){
 // 自定义插件, webpack运行时执行
 class WebpackRunPlugin{
   apply(compiler){
+    // tap注册事件
     compiler.hooks.run.tap('WebpackRunPlugin', () => {
       console.log('开始编译')
     })
