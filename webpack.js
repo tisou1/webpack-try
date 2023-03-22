@@ -15,7 +15,7 @@ class Compiler {
   compiler(onCompiled) {
     // 执行编译
     const compilation = new Compilation(this.option)
-    
+
     compilation.build(onCompiled)
 
   }
@@ -42,8 +42,15 @@ class Compilation{
   }
 
   build(callback) {
-    // ...
-    
+    // 拿到入口, 这里
+    let entry = {}
+    if(typeof this.options.entry === 'string') {
+      // 单入口
+      entry.main = this.options.entry
+    } else {
+      // 多入口
+      entry = this.options.entry
+    }
     // 编译成功够,执行回调函数
     callback()
   }
