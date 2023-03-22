@@ -2,9 +2,11 @@ const path = require('node:path')
 const {
   WebpackRunPlugin,
   WebpackDonePlugin,
+} = require('./plugins')
+const {
   loader1,
   loader2,
-} = require('./webpack')
+} = require('./loaders')
 
 module.exports = {
   mode: 'development', // 开发模式

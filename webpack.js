@@ -7,7 +7,6 @@ const parser = require('@babel/parser')
 const types = require('@babel/types')
 const traverse = require('@babel/traverse').default
 const generator = require('@babel/generator').default
-
 // 编译class,单例模式
 class Compiler {
   constructor(webpackOptions) {
@@ -263,39 +262,7 @@ function webpack(webpackOptions) {
 // Webpack Plugin 其实就是一个普通的函数，在该函数中需要我们定制一个 apply 方法
 // 当 Webpack 内部进行插件挂载时会执行 apply 函数
 
-// 自定义插件, webpack运行时执行
-class WebpackRunPlugin {
-  apply(compiler) {
-    // tap注册事件
-    compiler.hooks.run.tap('WebpackRunPlugin', () => {
-      console.log('开始编译')
-    })
-  }
-}
-
-// 自定义插件, webpacj运行完成时执行
-class WebpackDonePlugin {
-  apply(compiler) {
-    compiler.hooks.done.tap('WebpackDonePlugin', () => {
-      console.log('完成编译')
-    })
-  }
-}
-
-// 自定义loader
-
-const loader1 = (source) => {
-  return `${source}// 给代码添加注释: loader1`
-}
-
-const loader2 = (source) => {
-  return `${source}// 给代码添加注释: loader2`
-}
 
 module.exports = {
   webpack,
-  WebpackRunPlugin,
-  WebpackDonePlugin,
-  loader1,
-  loader2,
 }
